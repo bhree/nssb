@@ -10,7 +10,7 @@ if nssb .mymapgenis < 6 then
 end
 
 
--- schematichs generation
+-- schematics generation
 local posplace  = { x = 0,  y = -30093,  z = 0 }
 local posmemory = { x = 0,  y = -30092,  z = 0 }
 local postest   = { x = 5,  y = -30091,  z = 6 }
@@ -40,8 +40,8 @@ function nssb_register_buildings(
       local flag  = 0
       local posd
 
-      x  = math.random( minp.x,  maxp.x )
-      z  = math.random( minp.z,  maxp.z )
+      i  = math.random( minp.x,  maxp.x )
+      k  = math.random( minp.z,  maxp.z )
 
       for y = minp.y,  maxp.y do
         local pos1 = { x = i,  y = j,  z = k }
@@ -255,11 +255,17 @@ end
 
 -- build in all mapgen types
 
-nssb_register_buildings ('blocohouse', 4, 'default:stone', 0, 'air',  0, 'air', 3, 'default:stone', 5, true, -10, false, false, false)
+nssb_register_buildings(  'blocohouse',  4,  'default:stone',
+      0,  'air',  0, 'air', 3, 'default:stone',
+      5,  true,  -10,  false,  false,  false  )
 
-nssb_register_buildings ('bigblocohouse', 4, 'default:stone', 0, 'air',  0, 'air', 3, 'default:stone', 5, true, -20, false, false, false)
+nssb_register_buildings(  'bigblocohouse',  4,  'default:stone',
+      0,  'air',   0,  'air',  3,  'default:stone',
+      5,  true,  -20,  false,  false,  false  )
 
-nssb_register_buildings ('blocobiggesthouse', 4, 'default:stone', 0, 'air',  0, 'air', 3, 'default:stone', 5, true, -30, false, false, false)
+nssb_register_buildings(  'blocobiggesthouse',  4,  'default:stone',
+      0,  'air',  0,  'air',  3,  'default:stone',
+      5,  true,  -30,  false,  false,  false  )
 
 -- nodes gen  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -270,8 +276,35 @@ minetest .register_ore({
   ore_type       = 'scatter',
   ore            = 'nssb:indistructible_morentir',
 
-  wherein        = { 'default:water_source',
-                     'default:water_flowing',  'default:gravel',  'default:dirt',  'default:sand',  'default:lava_source',  'default:lava_flowing',  'default:mese_block',  'default:stone',  'air',  'default:stone_with_coal',  'default:stone_with_iron',  'default:stone_with_mese',  'default:stone_with_diamond',  'default:stone_with_gold',  'default:stone_with_copper',  'nssb:ant_dirt',  'default:stone',  'default:cobble',  'default:stonebrick',  'default:mossycobble',  'default:desert_stone',  'default:desert_cobble',  'default:desert_stonebrick',  'default:sandstone',  'default:sandstonebrick' },
+  wherein        = {  'default:water_source',
+                      'default:water_flowing',
+
+                      'default:lava_source',
+                      'default:lava_flowing',
+
+                      'air',
+                      'default:stone',
+                      'default:stone_with_coal',
+                      'default:stone_with_copper',
+                      'default:stone_with_iron',
+                      'default:stone_with_gold',
+                      'default:stone_with_diamond',
+                      'default:stone_with_mese',
+                      'default:mese_block',
+
+                      'nssb:ant_dirt',
+                      'default:dirt',
+                      'default:gravel',
+                      'default:sand',
+
+                      'default:cobble',
+                      'default:stonebrick',
+                      'default:mossycobble',
+                      'default:desert_stone',
+                      'default:desert_cobble',
+                      'default:desert_stonebrick',
+                      'default:sandstone',
+                      'default:sandstonebrick'  },
 
   clust_scarcity = 1,
   clust_num_ores = 1,
@@ -286,7 +319,9 @@ if moreores then
     minetest .register_ore({
       ore_type       = 'scatter',
       ore            = 'nssb:indistructible_morentir',
-      wherein        = { 'moreores:mineral_tin',  'moreores:mineral_silver',  'moreores:mineral_mithril' },
+      wherein        = {  'moreores:mineral_tin',
+                          'moreores:mineral_silver',
+                          'moreores:mineral_mithril'  },
       clust_scarcity = 1,
       clust_num_ores = 1,
       clust_size     = 1,
@@ -314,28 +349,43 @@ end
 
 replace2(  'default:stone',  'nssb:morentir'  )
 
-replace2(  {'default:stone_with_coal',
-            'default:stone_with_copper',
-            'default:stone_with_iron',
-            'default:stone_with_gold',
-            'default:stone_with_diamond',
-            'default:stone_with_mese',
-            'default:mese_block'},  'nssb:morelentir'  )
 
-replace2(  {'default:dirt',
-            'default:gravel',
-            'default:sand'}  'nssb:morelentir')
+replace2(  {  'default:stone_with_coal',
+              'default:stone_with_copper',
+              'default:stone_with_iron',
+              'default:stone_with_gold',
+              'default:stone_with_diamond',
+              'default:stone_with_mese',
+              'default:mese_block'  },  'nssb:morelentir'  )
 
-replace2(  {'default:water_source',
-            'default:water_flowing',
-            'default:lava_source',
-            'default:lava_flowing'}  'nssb:morelentir')
 
-replace2(  {'nssb:ant_dirt',  'default:stone',  'default:cobble',  'default:stonebrick',  'default:mossycobble',  'default:desert_stone',  'default:desert_cobble',  'default:desert_stonebrick',  'default:sandstone',  'default:sandstonebrick' },  'nssb:morelentir' )
+replace2(  {  'default:dirt',
+              'default:gravel',
+              'default:sand'  }  'nssb:morelentir'  )
+
+
+replace2(  {  'default:water_source',
+              'default:water_flowing',
+              'default:lava_source',
+              'default:lava_flowing'}  'nssb:morelentir'  )
+
+
+replace2(  {  'nssb:ant_dirt',
+              'default:stone',
+              'default:cobble',
+              'default:stonebrick',
+              'default:mossycobble',
+              'default:desert_stone',
+              'default:desert_cobble',
+              'default:desert_stonebrick',
+              'default:sandstone',
+              'default:sandstonebrick' },  'nssb:morelentir' )
 
 
 if moreores then
-  replace2(  {'moreores:mineral_tin',  'moreores:mineral_silver',  'moreores:mineral_mithril'},  'air' )
+  replace2(  {  'moreores:mineral_tin',
+                'moreores:mineral_silver',
+                'moreores:mineral_mithril'},  'air' )
 end
 
 
