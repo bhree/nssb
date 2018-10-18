@@ -1,7 +1,29 @@
+v3.0 - Oct 2018 -- Sketch2 updates
+
+  mapgen.lua
+    - if (nssb.mymapgenis~=6) and (nssb.mymapgenis~=7) then
+    -- if 7 is max, then (not 6) and (not 7) is the same as range(1-5)
+    + if nssb.mymapgenis < 6 then
+
+    - post_effect_color = { a=800, r=1, g=1, b=1 }
+    -- alpha range(0-255)   800 is right out
+
+    -- will change portal to use a "hold-item-and-punch" function instead of ABM's
+    -- it's bad enough to use ABM's for this, but what's with that timer function?
+
+
+  nodes.lua
+    - for i = 1, 32 do  minetest .register_ore({...})
+    -- why loop?  you only have to register once
+
+--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 v2.0 - 22-11-16
  - added the Morlendor dimension and all its materials;
  - added the compatibility with the mapgen v7 and valleys (and also fractal and flat);
  - added the portals to go to Morlendor and come back.
- 
+
+
 v1.0 - 22-03-16
 First stable release
+
