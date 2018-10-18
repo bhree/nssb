@@ -43,7 +43,7 @@ function nssb_register_buildings(
       i  = math.random( minp.x,  maxp.x )
       k  = math.random( minp.z,  maxp.z )
 
-      for y = minp.y,  maxp.y do
+      for j = minp.y,  maxp.y do
         local pos1 = { x = i,  y = j,  z = k }
         local pos2 = { x = i +down,  y = j -1,  z = k +down }
         local pos3 = { x = i,  y = j +above,  z = k }
@@ -135,11 +135,20 @@ end
 --  height,  ice,  exact_height,  portal  )
 
 if nssb .mymapgenis == 6 then  --~~~~~~~~~~~~~~~~~~~~~~~~~~
-  nssb_register_buildings ( 'spiaggiagranchius', 2, 'default:sand', 3, 'default:sand', 2, 'air',  3, 'air', 0, false, nil, false, false, false)
+  nssb_register_buildings(
+        'spiaggiagranchius',  2,  'default:sand',
+        3,  'default:sand',  2,  'air',
+        3, 'air',  0,  false,
+        nil,  false,  false,  false  )
 
-  nssb_register_buildings ('acquagranchius', 3, 'default:sand', 3, 'default:sand', 12,'default:water_source', 3, 'default:water_source', 0, false, nil, false, false, false)
+  nssb_register_buildings(
+        'acquagranchius',  3,  'default:sand',
+        3,  'default:sand',  12,  'default:water_source',
+        3,  'default:water_source',  0,  false,
+        nil,  false,  false,  false  )
 
-  nssb_register_buildings ('ooteca', 6, 'default:dirt_with_grass', 3, 'default:dirt', 2, 'air', 24, 'default:tree', 8, false, nil, false, false, false)
+  nssb_register_buildings(
+  'ooteca', 6, 'default:dirt_with_grass', 3, 'default:dirt', 2, 'air', 24, 'default:tree', 8, false, nil, false, false, false)
 
   nssb_register_buildings ('minuscolaooteca', 6, 'default:dirt_with_grass',3 , 'default:dirt', 2, 'air', 24, 'default:tree', 2, false, nil, false, false, false)
 
@@ -187,70 +196,82 @@ if nssb .mymapgenis == 6 then  --~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   nssb_register_buildings ('doppiopiccosabbia', 11, 'default:desert_sand', 1, 'default:desert_stone',  1, 'air', 3, 'default:desert_sand', 7, false, nil, false, false, false)
 
-  nssb_register_buildings ('piccoscrausics', 8, 'default:desert_sand', 1, 'default:desert_stone',  1, 'air', 3, 'default:desert_sand', 3, false, nil, false, false, false)
+  nssb_register_buildings(
+      'piccoscrausics',  8,  'default:desert_sand',
+      1,  'default:desert_stone',  1,  'air',
+      3,  'default:desert_sand',  3,  false,
+      nil,  false,  false,  false  )
 
-  nssb_register_buildings ('fossasand', 20, 'default:desert_sand', 1, 'default:desert_stone',  1, 'air', 3, 'default:desert_sand', 16, false, nil, false, false, false)
+  nssb_register_buildings(
+      'fossasand',  20,  'default:desert_sand',
+      1,  'default:desert_stone',  1,  'air',
+      3,  'default:desert_sand',  16,  false,
+      nil,  false,  false,  false  )
 
-  nssb_register_buildings ('portal', 100, 'default:dirt_with_grass', 2, 'default:dirt', 2, 'air', 24, 'air', 11, false, nil, false, false, true)
+  nssb_register_buildings(
+      'portal',  100,  'default:dirt_with_grass',
+      2,  'default:dirt',  2,  'air',
+      24,  'air',  11,  false,
+      nil,  false,  false,  true  )
 
 else  -- mymapgenis 7 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  nssb_register_buildings ('spiaggiagranchius', 5, 'default:sand', 3, 'default:sand', 2, 'air',  3, 'air', 0, false, nil, false, false, false)
+  nssb_register_buildings(  'spiaggiagranchius', 5, 'default:sand', 3, 'default:sand', 2, 'air',  3, 'air', 0, false, nil, false, false, false)
 
-  nssb_register_buildings ('acquagranchius', 6, 'default:sand', 3, 'default:sand', 12,'default:water_source', 3, 'default:water_source', 0, false, nil, false, false, false)
+  nssb_register_buildings(  'acquagranchius', 6, 'default:sand', 3, 'default:sand', 12,'default:water_source', 3, 'default:water_source', 0, false, nil, false, false, false)
 
-  nssb_register_buildings ('ooteca', 12, 'default:dirt_with_grass', 3, 'default:dirt', 2, 'air', 24, 'default:tree', 8, false, nil, false, false, false)
+  nssb_register_buildings(  'ooteca', 12, 'default:dirt_with_grass', 3, 'default:dirt', 2, 'air', 24, 'default:tree', 8, false, nil, false, false, false)
 
-  nssb_register_buildings ('minuscolaooteca', 11, 'default:dirt_with_grass',3 , 'default:dirt', 2, 'air', 24, 'default:tree', 2, false, nil, false, false, false)
+  nssb_register_buildings(  'minuscolaooteca', 11, 'default:dirt_with_grass',3 , 'default:dirt', 2, 'air', 24, 'default:tree', 2, false, nil, false, false, false)
 
-  nssb_register_buildings ('piccolaooteca', 11, 'default:dirt_with_grass', 2, 'default:dirt', 2, 'air', 24, 'default:tree', 4, false, nil, false, false, false)
+  nssb_register_buildings(  'piccolaooteca', 11, 'default:dirt_with_grass', 2, 'default:dirt', 2, 'air', 24, 'default:tree', 4, false, nil, false, false, false)
 
-  nssb_register_buildings ('arcate', 24, 'default:sand', 3, 'default:sand', 13, 'default:water_source', 3, 'default:water_source',0, false, nil, false, false, false)
+  nssb_register_buildings(  'arcate', 24, 'default:sand', 3, 'default:sand', 13, 'default:water_source', 3, 'default:water_source',0, false, nil, false, false, false)
 
-  nssb_register_buildings ('grandepiramide', 24, 'default:dirt', 3, 'default:dirt', 20, 'default:water_source', 3, 'default:water_source', 0, false, nil, false, false, false)
+  nssb_register_buildings( 'grandepiramide', 24, 'default:dirt', 3, 'default:dirt', 20, 'default:water_source', 3, 'default:water_source', 0, false, nil, false, false, false)
 
-  nssb_register_buildings ('collina', 14, 'default:dirt_with_grass', 3, 'default:dirt', 2, 'air', 3, 'air', 12, false, nil, false, false, false)
+  nssb_register_buildings(  'collina', 14, 'default:dirt_with_grass', 3, 'default:dirt', 2, 'air', 3, 'air', 12, false, nil, false, false, false)
 
-  nssb_register_buildings ('megaformicaio', 20, 'default:dirt_with_grass', 4, 'default:dirt', 2, 'air', 3, 'air', 25, false, nil, false, false, false)
+  nssb_register_buildings(  'megaformicaio', 20, 'default:dirt_with_grass', 4, 'default:dirt', 2, 'air', 3, 'air', 25, false, nil, false, false, false)
 
-  nssb_register_buildings ('antqueenhill', 22, 'default:dirt_with_grass', 4, 'default:dirt', 2, 'air', 3, 'air', 21, false, nil, false, false, false)
+  nssb_register_buildings(  'antqueenhill', 22, 'default:dirt_with_grass', 4, 'default:dirt', 2, 'air', 3, 'air', 21, false, nil, false, false, false)
 
-  nssb_register_buildings ('rovine1', 6, 'default:dirt_with_grass', 3, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
+  nssb_register_buildings(  'rovine1', 6, 'default:dirt_with_grass', 3, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
 
-  nssb_register_buildings ('rovine3', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
+  nssb_register_buildings(  'rovine3', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
 
-  nssb_register_buildings ('rovine4', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
+  nssb_register_buildings(  'rovine4', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
 
-  nssb_register_buildings ('rovine5', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
+  nssb_register_buildings(  'rovine5', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
 
-  nssb_register_buildings ('rovine6', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
+  nssb_register_buildings(  'rovine6', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
 
-  nssb_register_buildings ('rovine7', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
+  nssb_register_buildings(  'rovine7', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
 
-  nssb_register_buildings ('rovine8', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
+  nssb_register_buildings(  'rovine8', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
 
-  nssb_register_buildings ('rovine9', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
+  nssb_register_buildings(  'rovine9', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
 
-  nssb_register_buildings ('rovine10', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
+  nssb_register_buildings(  'rovine10', 6, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
 
-  nssb_register_buildings ('bozzoli', 4, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
+  nssb_register_buildings(  'bozzoli', 4, 'default:dirt_with_grass', 1, 'default:dirt',  2, 'air', 8, 'default:jungletree', 10, false, nil, false, false, false)
 
-  nssb_register_buildings ('picco', 32, 'default:desert_sand', 1, 'default:desert_stone',  1, 'air', 3, 'default:desert_sand', 10, false, nil, false, false, false)
+  nssb_register_buildings(  'picco', 32, 'default:desert_sand', 1, 'default:desert_stone',  1, 'air', 3, 'default:desert_sand', 10, false, nil, false, false, false)
 
   nssb_register_buildings ('piccoghiaccio', 32, 'default:dirt_with_snow', 1, 'default:dirt',  1, 'air', 3, 'default:dirt_with_snow', 10, false, nil, true, false, false)
 
-  nssb_register_buildings ('icehall', 40, 'default:dirt_with_snow', 1, 'default:dirt',  1, 'air', 3, 'default:dirt_with_snow', 30, false, nil, true, false, false)
+  nssb_register_buildings(  'icehall', 40, 'default:dirt_with_snow', 1, 'default:dirt',  1, 'air', 3, 'default:dirt_with_snow', 30, false, nil, true, false, false)
 
-  nssb_register_buildings ('piccomoonheron', 32, 'default:dirt_with_snow', 1, 'default:dirt',  1, 'air', 3, 'default:dirt_with_snow', 3, false, nil, true, false, false)
+  nssb_register_buildings(  'piccomoonheron', 32, 'default:dirt_with_snow', 1, 'default:dirt',  1, 'air', 3, 'default:dirt_with_snow', 3, false, nil, true, false, false)
 
-  nssb_register_buildings ('doppiopiccoghiaccio', 32, 'default:dirt_with_snow', 1, 'default:dirt',  1, 'air', 3, 'default:dirt_with_snow', 7, false, nil, true, false, false)
+  nssb_register_buildings(  'doppiopiccoghiaccio', 32, 'default:dirt_with_snow', 1, 'default:dirt',  1, 'air', 3, 'default:dirt_with_snow', 7, false, nil, true, false, false)
 
-  nssb_register_buildings ('doppiopiccosabbia', 32, 'default:desert_sand', 1, 'default:desert_stone',  1, 'air', 3, 'default:desert_sand', 7, false, nil, false, false, false)
+  nssb_register_buildings(  'doppiopiccosabbia', 32, 'default:desert_sand', 1, 'default:desert_stone',  1, 'air', 3, 'default:desert_sand', 7, false, nil, false, false, false)
 
-  nssb_register_buildings ('piccoscrausics', 32, 'default:desert_sand', 1, 'default:desert_stone',  1, 'air', 3, 'default:desert_sand', 3, false, nil, false, false, false)
+  nssb_register_buildings(  'piccoscrausics', 32, 'default:desert_sand', 1, 'default:desert_stone',  1, 'air', 3, 'default:desert_sand', 3, false, nil, false, false, false)
 
-  nssb_register_buildings ('fossasand', 50, 'default:desert_sand', 1, 'default:desert_stone',  1, 'air', 3, 'default:desert_sand', 16, false, nil, false, false, false)
+  nssb_register_buildings(  'fossasand', 50, 'default:desert_sand', 1, 'default:desert_stone',  1, 'air', 3, 'default:desert_sand', 16, false, nil, false, false, false)
 
-  nssb_register_buildings ('portal', 200, 'default:dirt_with_grass', 2, 'default:dirt', 2, 'air', 24, 'air', 11, false, nil, false, false, true)
+  nssb_register_buildings(  'portal', 200, 'default:dirt_with_grass', 2, 'default:dirt', 2, 'air', 24, 'air', 11, false, nil, false, false, true)
 end
 
 -- build in all mapgen types
@@ -361,13 +382,13 @@ replace2(  {  'default:stone_with_coal',
 
 replace2(  {  'default:dirt',
               'default:gravel',
-              'default:sand'  }  'nssb:morelentir'  )
+              'default:sand'  },  'nssb:morelentir'  )
 
 
 replace2(  {  'default:water_source',
               'default:water_flowing',
               'default:lava_source',
-              'default:lava_flowing'}  'nssb:morelentir'  )
+              'default:lava_flowing'},  'nssb:morelentir'  )
 
 
 replace2(  {  'nssb:ant_dirt',
