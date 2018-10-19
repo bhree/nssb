@@ -172,7 +172,7 @@ minetest .register_node( 'nssb:vertical_web',  {
   liquid_range  = 0,
   liquid_alternative_flowing  = 'nssb:vertical_web',
   liquid_alternative_source  = 'nssb:vertical_web',
-  liquid_viscosity  = 20,
+  liquid_viscosity  = 4,
   groups  = { flammable = 2,  snappy = 1,  liquid = 1 },
 })
 
@@ -194,7 +194,7 @@ minetest .register_node( 'nssb:web_cone_up',  {
   liquid_range= 0,
   liquid_alternative_flowing  = 'nssb:web_cone_up',
   liquid_alternative_source  = 'nssb:web_cone_up',
-  liquid_viscosity  = 20,
+  liquid_viscosity  = 5,
   groups  = { flammable = 2,  snappy = 1,  liquid = 1 },
 })
 
@@ -216,7 +216,7 @@ minetest .register_node( 'nssb:web_cone_down',  {
   liquid_range= 0,
   liquid_alternative_flowing  = 'nssb:web_cone_down',
   liquid_alternative_source  = 'nssb:web_cone_down',
-  liquid_viscosity  = 20,
+  liquid_viscosity  = 5,
   groups  = { flammable = 2,  snappy = 1,  liquid = 1 },
 })
 
@@ -224,9 +224,9 @@ minetest .register_node( 'nssb:web_cone_down',  {
 minetest .register_craft({
   output  = 'nssb:marine_meselamp',
   recipe  = {
-    {'default:glass',  'bucket :bucket_water',  'default:glass'},
+    {'default:glass',  'bucket:bucket_water',  'default:glass'},
     {'default:glass',  'default:mese_crystal',  'default:glass'},
-    {'default:glass',  'bucket :bucket_water',  'default:glass'}
+    {'default:glass',  'bucket:bucket_water',  'default:glass'}
   }
 })
 
@@ -291,7 +291,7 @@ minetest .register_node(  'nssb:web_cocoon',  {
                  },{  items  = { "node 'nssm:raw_scrausics_wing' 2" },
                       rarity  = 20
 
-                 },{  items  = { "node 'nssm:nssm:mantis_claw' 1" },
+                 },{  items  = { "node 'nssm:mantis_claw' 1" },
                       rarity  = 20
 
                  },{  items  = { "node 'default:axe_mese' 1" },
@@ -344,9 +344,9 @@ function nssb_register_eggs(
     action  = function(  pos,  node,  active_object_count,
                                       active_object_count_wider  )
 
-    local pos1  = { x = pos.x +math.random( -wide,  wide ),
-                    y = pos.y +0.5,
-                    z = pos.z +math.random( -wide,  wide )  }
+    local pos1  = { x  = pos.x +math.random( -wide,  wide ),
+                    y  = pos.y +0.5,
+                    z  = pos.z +math.random( -wide,  wide )  }
     local nodename  = minetest .env :get_node( pos1 ) .name
 
     if nodename ~= 'air' and nodename ~= 'default:water_source' then
@@ -354,14 +354,14 @@ function nssb_register_eggs(
     end
 
     local count  = 0
-    local objects  = minetest .env :get_objects_inside_radius(pos, 12)
+    local objects  = minetest .env :get_objects_inside_radius( pos, 12 )
     for _,obj in ipairs(objects) do
       count  = count +1
-      --minetest .chat_send_all('Count : ' ..count)
+      --minetest .chat_send_all('Count: ' ..count)
     end -- ipairs
 
     local t  = minetest .get_timeofday()
-    --minetest .chat_send_all('Time of day : ' ..t)
+    --minetest .chat_send_all('Time of day: ' ..t)
 
     if ( t >= 0.75 and t <= 1 )
     or ( t >= 0 and t <= 0.25 ) or night == false then
@@ -470,7 +470,7 @@ function nssb_register_eggboss (
 end
 
 
--- Bosses of the eggs :
+-- Bosses of the eggs:
 -- ( name,  description,
 --     interval,  radius,  max spawned,  neighbor,  night,  luminosity )
 
@@ -519,6 +519,7 @@ minetest .register_abm(  {
 
 -- Morlavala nodes  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+-- default stone
 minetest .register_node( 'nssb:morentir',  {
   description  = 'Dark Stone',
   tiles  = { 'morentir.png' },
@@ -573,6 +574,7 @@ minetest .register_node( 'nssb:morelentir',  {
 })
 
 
+-- lighter purple than default stone
 minetest .register_node( 'nssb:morkemen',  {
   description  = 'Dark Dirt',
   tiles  = { 'morkemen.png' },
@@ -599,6 +601,7 @@ minetest .register_node( 'nssb:morvilya',  {
 })
 
 
+-- white flame, blue tips
 minetest .register_node(  'nssb:mornar',  {
   description  = 'Black Flame',
   drawtype  = 'firelike',
@@ -822,7 +825,7 @@ minetest .register_node( 'nssb:dis_morvalar_block',  {
   tiles  = { 'dis_morvalar_block.png' },
   on_punch  = function( pos,  node,  puncher )
     if puncher :get_wielded_item() :get_name() == 'nssm:superior_energy_globe' then
-      minetest .set_node( pos,  {name='nssb:morvalar_block'})
+      minetest .set_node( pos,  { name = 'nssb:morvalar_block' })
     end -- if puncher
   end -- on_punch
 })
