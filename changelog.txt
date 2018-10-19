@@ -1,20 +1,105 @@
 v3.0 - Oct 2018 -- Sketch2 updates
 
   mapgen.lua
-    - if (nssb.mymapgenis~=6) and (nssb.mymapgenis~=7) then
-    -- if 7 is max, then (not 6) and (not 7) is the same as range(1-5)
-    + if nssb.mymapgenis < 6 then
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    - post_effect_color = { a=800, r=1, g=1, b=1 }
-    -- alpha range(0-255)   800 is right out
+    > complete rebuild of the nssb_register_buildings() function.
+      that was a wreck.  up was down, down was up:
+
+        if (downblock==nil) then
+          u = downblock
+        end
+        if (aboveblock==nil) then
+          d = aboveblock
+        end
+
+    > passing parameters that never got used:
+
+        if portal==true then
+        --[[ we'll just comment this entire block of code out here ]]-- end
+
+    > defining a variable, then 2 lines later asking if it exists:
+
+        posarena = {x=777, y=-30096, z=-777}
+        if posarena then...
+
+    > height calculations are a complete mess.
+      lets take a moment to generate a random number,
+      then only use it if it suits our needs..?
+
+        jj = math.random(minp.y, maxp.y)
+          if height>maxp.y then
+            j = jj
+
+    > scanning for nodes from a position other than the origin:
+
+        local pos3 = {x=i, y=j+above, z=k}
+        if minetest.find_node_near(pos3, radius, near) then
+
+    > adding down to the x and z coords instead of y:
+
+        - local pos2 = {x=i+down, y=j-1, z=k+down}
+        that's the kind of math that makes sharks swim sideways
+
+    > don't need to scan for modpath every time you load a scheme.
+
+      - minetest.place_schematic(node, minetest.get_modpath('nssb')
+            ..'/schems/'..build..'.mts', '0', {}, true)
+
+    > instead, save that info in a variable, then append where needed:
+
+      + local schemepath  = minetest .get_modpath('nssb') ..'/schems/'
+      + minetest .place_schematic(  node,
+            schemepath ..build ..'.mts',  '0',  {},  true  )
+
+    > alpha is range(0-255)   800 is way off the charts
+
+      - post_effect_color = { a=800, r=1, g=1, b=1 }
+      + post_effect_color = { a=3, r=1, g=1, b=1 }
+
+    > gotta love those ABM's
+      every time you walk by indistructible_morentir,
+      that happens to have mornar next to it, guess what...
+      it starts replacing the entire arena every second ?!?
+
+          minetest.register_abm({
+            nodenames = {"nssb:indistructible_morentir"},
+            neighbors = {"nssb:mornar"},
+            interval = 1.0,
+            chance = 1,
+            action = function(pos, node)
+                --minetest.chat_send_all("Ciao ciao pirloni")
+          minetest.place_schematic(posarena,
+
+    > wtf is this:
+      --the timer is saved inside a position because for me the tonumber function doesn't work
 
     -- will change portal to use a "hold-item-and-punch" function instead of ABM's
     -- it's bad enough to use ABM's for this, but what's with that timer function?
 
 
   nodes.lua
-    - for i = 1, 32 do  minetest .register_ore({...})
-    -- why loop?  you only have to register once
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    > why loop?  you only have to register once
+
+      - for i = 1, 32 do  minetest .register_ore({...})
+
+    > typo, missed quote:
+
+      - "node 'nssm:web 1"
+      + "node 'nssm:web' 1"
+
+    > typo, only need 1 nssm:
+
+      - "node 'nssm:nssm:mantis_claw' 1"
+      + "node 'nssm:mantis_claw' 1"
+
+    > lava has a viscosity of 7, webs are not thicker than lava.
+
+      - liquid_viscosity  = 20,
+      + liquid_viscosity  = 5,
+
 
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -26,4 +111,3 @@ v2.0 - 22-11-16
 
 v1.0 - 22-03-16
 First stable release
-
