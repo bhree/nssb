@@ -19,55 +19,67 @@ function nssb_register_buildings(
 
       height = height or 0  -- default to 0 if nil given
 
+      local i, j, k
+      local placed_scheme  = false
+
+      i  = math.random( minp.x,  maxp.x )
+      k  = math.random( minp.z,  maxp.z )
+
       if ( height >= 0 and minp.y > 0 ) -- aboveground
 
 -- scan down 2 nodes from top, till we hit something other than air
--- then go back up one block to see if it's solid
+        j  = maxp.y
+        while minetest.env :get_node( {  i, j, k  } ) .name == 'air' do
+          j = j -2
+        end
 
-      or maxp.y < height then -- belowground
+        -- then go back up one block to see if it's solid
+        local above  = { i,  j +1,  k }
+        local nodename_above  = minetest.env :get_node( above ) .name
 
-        local i, j, k
-        local placed_scheme  = false
+        if nodename_above ~= 'air' then
+          j = j +1
+        end
 
-        i  = math.random( minp.x,  maxp.x )
+      else -- underground
         j  = math.random( minp.y,  maxp.y )
-        k  = math.random( minp.z,  maxp.z )
+      end
 
-        local node = { x = i,  y = j,  z = k }
-        local nodename = minetest.env :get_node(node) .name
+      local node = { x = i,  y = j,  z = k }
+      local nodename = minetest.env :get_node(node) .name
 
-        if nodename == required_block and math.random( 1, rand ) == 1 then
-          if minetest .find_node_near( node,  4,  near ) then
+      if nodename == required_block and math.random( 1, rand ) == 1 then
+        if minetest .find_node_near( node,  4,  near ) then
 
-              minetest .place_schematic(  node,
-                schemepath ..build ..'.mts',  '0',  {},  true  )
-              placed_scheme  = true
-          end -- find_node_near()
-        end -- if nodename == required_block and...
+            minetest .place_schematic(  node,
+              schemepath ..build ..'.mts',  '0',  {},  true  )
+            placed_scheme  = true
+        end -- find_node_near()
+      end -- if nodename == required_block and...
 
-        -- fill space below scheme, if required
-        if placed_scheme and width > 0 then
-          for dx  = -width,  width *2 do
-            for dz  = -width,  width *2 do
-              local gap2fill  = {  x  = node.x +dx,
-                                   y  = node.y -1,
-                                   z  = node.z +dz  }
-              local nodename  = minetest .env :get_node( gap2fill ) .name
+      -- fill space below scheme, if required
+      if placed_scheme and width > 0 then
+        for dx  = -width,  width *2 do
+          for dz  = -width,  width *2 do
+            local gap2fill  = {  x  = node.x +dx,
+                                 y  = node.y -1,
+                                 z  = node.z +dz  }
+            local nodename  = minetest .env :get_node( gap2fill ) .name
 
-              while nodename == 'air'
-                 or nodename == 'default:water_source'
-                 or nodename == 'default:water_flowing'
-                 or nodename == 'default:lava_flowing'
-                 or nodename == 'default:lava_source' do
-                  minetest .env :set_node(  gap2fill,  { name = required } )
+            while nodename == 'air'
+               or nodename == 'default:water_source'
+               or nodename == 'default:water_flowing'
+               or nodename == 'default:lava_flowing'
+               or nodename == 'default:lava_source' do
+                minetest .env :set_node( gap2fill, { name = required } )
 
-                  gap2fill.y  = gap2fill.y -1 -- keep going down
-                  nodename  = minetest .env :get_node( gap2fill ) .name
-              end  -- while air or water or lava
-            end  -- dz
-          end  -- dx
-        end  -- if placed_scheme and width > 0
-      end  -- if height aboveground or underground
+                gap2fill.y  = gap2fill.y -1 -- keep going down
+                nodename  = minetest .env :get_node( gap2fill ) .name
+            end  -- while air or water or lava
+          end  -- dz
+        end  -- dx
+      end  -- if placed_scheme and width > 0
+
     end  -- function( minp,  maxp,  seed )
   )  -- .register_on_generated()
 end  -- nssb_register_buildings()
@@ -176,23 +188,48 @@ nssb_register_buildings(  'bigblocohouse',  4,
 nssb_register_buildings(  'blocobiggesthouse',  4,
     'default:stone',  -150,  'default:stone',  5  )
 
--- nodes gen  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- node groups  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-moreores_names  = {  'moreores:mineral_tin',
-                     'moreores:mineral_silver',
-                     'moreores:mineral_mithril' }
+local moreore_names  = {  'moreores:mineral_tin',
+                           'moreores:mineral_silver',
+                           'moreores:mineral_mithril' }
 
 
--- This dimension is divided into 7 layers
--- 1st layer from 30000 to 30007 is indistructible morentir
+local stones_with  = {  'default:stone_with_coal',
+                        'default:stone_with_copper',
+                        'default:stone_with_iron',
+                        'default:stone_with_gold',
+                        'default:stone_with_diamond',
+                        'default:stone_with_mese',
+                        'default:mese_block'  }
 
-minetest .register_ore({
-  ore_type       = 'scatter',
-  ore            = 'nssb:indistructible_morentir',
 
-  wherein        = {  'default:water_source',
+local sources  = {  'default:water_source',
+                    'default:lava_source'  }
+
+
+local flowing  = {  'default:water_flowing',
+                    'default:lava_flowing'  }
+
+
+local cobbles  = {  'default:cobble',
+                    'default:stonebrick',
+                    'default:mossycobble',
+                    'default:desert_stone',
+                    'default:desert_cobble',
+                    'default:desert_stonebrick',
+                    'default:sandstone',
+                    'default:sandstonebrick' }
+
+
+local dirts  = {  'nssb:ant_dirt',
+                  'default:dirt',
+                  'default:gravel',
+                  'default:sand'  }
+
+
+local all_nodes  = {  'default:water_source',
                       'default:water_flowing',
-
                       'default:lava_source',
                       'default:lava_flowing',
 
@@ -218,34 +255,16 @@ minetest .register_ore({
                       'default:desert_cobble',
                       'default:desert_stonebrick',
                       'default:sandstone',
-                      'default:sandstonebrick'  },
-
-  clust_scarcity = 1,
-  clust_num_ores = 1,
-  clust_size     = 1,
-  y_min          = -30044,
-  y_max          = -30037,
-})
+                      'default:sandstonebrick'  }
 
 
+local life  = 'nssb:life_energy_ore'
 
-if moreores then
-    minetest .register_ore({
-      ore_type       = 'scatter',
-      ore            = 'nssb:indistructible_morentir',
-      wherein        = moreores_names,
-      clust_scarcity = 1,
-      clust_num_ores = 1,
-      clust_size     = 1,
-      y_min          = -30044,
-      y_max          = -30037,
-    })
-end
+local bedrock = 'nssb:indistructible_morentir'
 
+-- nodes gen  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- 2nd layer from 30008 to 30028, is 'stalagmitic', have bats and morelentir
-
-local function replace2( old, new )
+local function replace(  old,  new,  min,  max  )
   minetest .register_ore({
     ore_type       = 'scatter',
     ore            = new,
@@ -253,60 +272,43 @@ local function replace2( old, new )
     clust_scarcity = 1,
     clust_num_ores = 1,
     clust_size     = 1,
-    y_min          = -30065,
-    y_max          = -30045,
+    y_min          = min,
+    y_max          = max,
   })
 end
 
+-- This dimension is divided into 7 layers
 
-replace2(  'default:stone',  'nssb:morentir'  )
+-- 1st layer 30000 to 30030 is indistructible morentir
+-- as is 7th layer from 30191 to 30200
 
-
-replace2(  {  'default:stone_with_coal',
-              'default:stone_with_copper',
-              'default:stone_with_iron',
-              'default:stone_with_gold',
-              'default:stone_with_diamond',
-              'default:stone_with_mese',
-              'default:mese_block'  },  'nssb:morelentir'  )
-
-
-replace2(  {  'default:dirt',
-              'default:gravel',
-              'default:sand'  },  'nssb:morelentir'  )
-
-
-replace2(  {  'default:water_source',
-              'default:water_flowing',
-              'default:lava_source',
-              'default:lava_flowing'},  'nssb:morelentir'  )
-
-
-replace2(  {  'nssb:ant_dirt',
-              'default:stone',
-              'default:cobble',
-              'default:stonebrick',
-              'default:mossycobble',
-              'default:desert_stone',
-              'default:desert_cobble',
-              'default:desert_stonebrick',
-              'default:sandstone',
-              'default:sandstonebrick' },  'nssb:morelentir' )
-
+replace(  all_nodes,  bedrock,  -30000,  -30030  )
+replace(  all_nodes,  bedrock,  -30191,  -30200  )
 
 if moreores then
-  replace2(  moreores_names,  'air' )
+  replace(  moreore_names,  bedrock,  -30000,  -30030  )
+  replace(  moreore_names,  bedrock,  -30191,  -30200  )
 end
 
 
-minetest .register_ore({
+-- 2nd layer 30031 to 30060, is 'stalagmitic', with bats and lights
+-- + 3rd layer 30061 to 30070, is air so we'll just include that here.
+
+replace(  all_nodes,  'air',  -30031,  -30070  )
+
+if moreores then
+  replace2(  moreore_names,  'air',  -30031,  -30070  )
+end
+
+
+minetest .register_ore({  -- dark air
   ore_type        = 'blob',
   ore             = 'nssb:morvilya',
-  wherein         = 'nssb:morentir',
-  clust_scarcity  = 15 *15 *15,
-  clust_size      = 6,
-  y_min           = -30065,
-  y_max           = -30045,
+  wherein         = 'air',
+  clust_scarcity  = 12 *12 *12,
+  clust_size      = 12,
+  y_min           = -30031,
+  y_max           = -30060,
   noise_threshold = 0.0,
   noise_params    = {
     offset = 0.5,
@@ -319,388 +321,115 @@ minetest .register_ore({
 })
 
 
-
-minetest .register_ore({
-    ore_type       = 'scatter',
-    ore            = 'air',
-    wherein        = 'nssb:morentir',
-    clust_scarcity = 1,
-    clust_num_ores = 1,
-    clust_size     = 1,
-    y_min          = -30066,
-    y_max          = -30058,
-  })
-
-
--- 3rd layer from 30029 to 30077 is made by air
-
-minetest .register_ore({
-  ore_type       = 'scatter',
-  ore            = 'air',
-  wherein        = {  'nssb:ant_dirt',
-                      'default:stone',
-                      'default:cobble',
-                      'default:stonebrick',
-                      'default:mossycobble',
-                      'default:desert_stone',
-                      'default:desert_cobble',
-                      'default:desert_stonebrick',
-                      'default:sandstone',
-                      'default:sandstonebrick',
-                      'default:water_source',
-                      'default:water_flowing',
-                      'default:gravel',
-                      'default:dirt',
-                      'default:sand',
-                      'default:lava_source',
-                      'default:lava_flowing',
-                      'default:mese_block',
-                      'default:stone',
-                      'air',  'default:stone_with_coal',  'default:stone_with_iron',  'default:stone_with_mese',  'default:stone_with_diamond',  'default:stone_with_gold',  'default:stone_with_copper'  },
-  clust_scarcity = 1,
-  clust_num_ores = 1,
-  clust_size     = 1,
-  y_min          = -30093,
-  y_max          = -30066,
+minetest .register_ore({  -- light
+  ore_type        = 'blob',
+  ore             = 'nssb:morelentir',
+  wherein         = 'air',
+  clust_scarcity  = 12 *12 *12,
+  clust_size      = 12,
+  y_min           = -30031,
+  y_max           = -30060,
+  noise_threshold = 0.0,
+  noise_params    = {
+    offset = 0.5,
+    scale = 0.2,
+    spread = { x = 5,  y = 5,  z = 5 },
+    seed = 7676,
+    octaves = 1,
+    persist = 0.0
+  },
 })
 
+-- same all the way down to 30200
 
-if moreores then
-  minetest .register_ore({
-    ore_type       = 'scatter',
-    ore            = 'air',
-    wherein        = moreores_names,
-    clust_scarcity = 1,
-    clust_num_ores = 1,
-    clust_size     = 1,
-    y_min          = -30093,
-    y_max          = -30066,
-  })
+replace( 'default:stone',  'nssb:morentir',  -30071,  -30200  )
+replace( cobbles,  'nssb:morkemen', -30071,  -30200 )  -- dirt
+
+replace( sources,  'nssb:mornen', -30071,  -30200 )  -- liquids
+replace( flowing,  'nssb:mornen_flowing', -30071,  -30200 )
+
+replace( 'default:mese_block',  life,  -30071,  -30200 )
+
+
+-- 4th layer 30071 to 30090 is a plain with mobs, fire, water...
+
+replace( stones_with,  'air',  -30071,  -30090  )
+replace( dirts,  'nssb:morkemen', -30071,  -30090 )  -- dirt
+
+if moreores then  -- dirt
+  replace(    moreore_names,  'nssb:morkemen' )
 end
 
-
-minetest .register_ore({
-    ore_type        = 'blob',
-    ore             = 'nssb:morelentir',
-    wherein         = 'air',
-    clust_scarcity  = 10 *10 *10,
-    clust_size      = 3,
-    y_min           = -30068,
-    y_max           = -30065,
-    noise_threshold = 0.0,
-    noise_params    = {
-      offset = 0.5,
-      scale = 0.2,
-      spread = { x = 5,  y = 5,  z = 5 },
-      seed = 17676,
-      octaves = 1,
-      persist = 0.0
-    },
-  })
-
-
-minetest .register_ore({
-    ore_type        = 'blob',
-    ore             = 'nssb:morelentir',
-    wherein         = 'air',
-    clust_scarcity  = 16 *16 *16,
-    clust_size      = 6,
-    y_min           = -30071,
-    y_max           = -30065,
-    noise_threshold = 0.0,
-    noise_params    = {
-      offset = 0.5,
-      scale = 0.2,
-      spread = { x = 5,  y = 5,  z = 5 },
-      seed = 17676,
-      octaves = 1,
-      persist = 0.0
-    },
-  })
-
-
-minetest .register_ore({
-    ore_type        = 'blob',
-    ore             = 'nssb:morvilya',
-    wherein         = 'nssb:morentir',
-    clust_scarcity  = 15 *15 *15,
-    clust_size      = 6,
-    y_min           = -30092,
-    y_max           = -30066,
-    noise_threshold = 0.0,
-    noise_params    = {
-      offset = 0.5,
-      scale = 0.2,
-      spread = { x = 5,  y = 5,  z = 5 },
-      seed = 17676,
-      octaves = 1,
-      persist = 0.0
-    },
-  })
-
-
-minetest .register_ore({
-    ore_type        = 'blob',
-    ore             = 'nssb:morentir',
-    wherein         = 'air',
-    clust_scarcity  = 13 *13 *13,
-    clust_size      = 6,
-    y_min           = -30095,
-    y_max           = -30089,
-    noise_threshold = 0.0,
-    noise_params    = {
-      offset = 0.5,
-      scale = 0.2,
-      spread = { x = 5,  y = 5,  z = 5 },
-      seed = 17676,
-      octaves = 1,
-      persist = 0.0
-    },
-  })
-
-
-minetest .register_ore({
-    ore_type        = 'blob',
-    ore             = 'nssb:morentir',
-    wherein         = 'air',
-    clust_scarcity  = 11 *11 *11,
-    clust_size      = 5,
-    y_min           = -30095,
-    y_max           = -30090,
-    noise_threshold = 0.0,
-    noise_params    = {
-      offset = 0.5,
-      scale = 0.2,
-      spread = { x = 5,  y = 5,  z = 5 },
-      seed = 17676,
-      octaves = 1,
-      persist = 0.0
-    },
-  })
-
-
-minetest .register_ore({
-    ore_type        = 'blob',
-    ore             = 'nssb:morentir',
-    wherein         = 'air',
-    clust_scarcity  = 10 *10 *10,
-    clust_size      = 4,
-    y_min           = -30095,
-    y_max           = -30091,
-    noise_threshold = 0.0,
-    noise_params    = {
-      offset = 0.5,
-      scale = 0.2,
-      spread = { x = 5,  y = 5,  z = 5 },
-      seed = 17676,
-      octaves = 1,
-      persist = 0.0
-    },
-  })
-
-
-minetest .register_ore({
-    ore_type        = 'blob',
-    ore             = 'nssb:morentir',
-    wherein         = 'air',
-    clust_scarcity  = 10 *10 *10,
-    clust_size      = 10,
-    y_min           = -30095,
-    y_max           = -30089,
-    noise_threshold = 0.0,
-    noise_params    = {
-      offset = 1,
-      scale = 1,
-      spread = { x = 1,  y = 1000,  z = 1 },
-      seed = 17676,
-      octaves = 1,
-      persist = 0.0
-    },
-  })
-
-
--- 4th layer from  30078 to 30091 is a plain with mobs, fire, water...
-
-local function replace4( old,  new,  min,  max )
-    minetest .register_ore({
-      ore_type       = 'scatter',
-      ore            = new,
-      wherein        = old,
-      clust_scarcity = 1,
-      clust_num_ores = 1,
-      clust_size     = 1,
-      y_min          = -30107,
-      y_max          = -30094,
-    })
-end
-
-
-replace4('default:stone',  'nssb:morentir')
-replace4('default:stone_with_coal',  'nssb:mornen')
-replace4('default:stone_with_iron',  'air')
-replace4('default:stone_with_mese',  'air')
-replace4('default:stone_with_diamond',  'air')
-replace4('default:stone_with_gold',  'air')
-replace4('default:stone_with_copper',  'air')
-replace4('default:gravel',  'nssb:morkemen')
-replace4('default:dirt',  'nssb:morkemen')
-replace4('default:sand',  'nssb:morkemen')
-replace4('default:lava_source',  'nssb:mornen')
-replace4('default:lava_flowing',  'nssb:mornen_flowing')
-replace4('default:water_source',  'nssb:mornen')
-replace4('default:water_flowing',  'nssb:mornen_flowing')
-replace4('default:mese_block', 'nssb:life_energy_ore')
-
-replace4(  { 'nssb:ant_dirt',
-             'default:stone',
-             'default:cobble',
-             'default:stonebrick',
-             'default:mossycobble',
-             'default:desert_stone',
-             'default:desert_cobble',
-             'default:desert_stonebrick',
-             'default:sandstone',
-             'default:sandstonebrick'  },   'nssb:morkemen' )
-
-
-if moreores then
-  replace4(  moreores_names,  'nssb:morentir' )
-end
-
-
-minetest .register_ore({
+minetest .register_ore({  -- flower
   ore_type       = 'scatter',
   ore            = 'nssb:morlote',
   wherein        = 'air',
-  clust_scarcity = 7 *7 *7,
+  clust_scarcity = 8 *1 *8,
   clust_num_ores = 1,
   clust_size     = 1,
-  y_min          = -30094,
-  y_max          = -30093,
+  y_min          = -30088,
+  y_max          = -30090,
 })
 
 
-minetest .register_ore({
+minetest .register_ore({  -- white flame, blue tips
   ore_type       = 'scatter',
   ore            = 'nssb:mornar',
   wherein        = 'air',
-  clust_scarcity = 4 *4 *4,
+  clust_scarcity = 9 *1 *9,
   clust_num_ores = 1,
   clust_size     = 1,
-  y_min          = -30094,
-  y_max          = -30093,
+  y_min          = -30088,
+  y_max          = -30090,
 })
 
 
-minetest .register_ore({
+minetest .register_ore({  -- one-eyed magenta mug
   ore_type       = 'scatter',
   ore            = 'nssm:morwa_statue',
   wherein        = 'air',
-  clust_scarcity = 18 *18 *18,
+  clust_scarcity = 20 *1 *20,
   clust_num_ores = 1,
   clust_size     = 1,
-  y_min          = -30094,
-  y_max          = -30093,
+  y_min          = -30088,
+  y_max          = -30090,
 })
 
--- 5th layer from 30092 to 30140 is underground with caves
+-- 5th layer from 30091 to 30140 is underground with caves
 
-local function replace5( old, new )
-    minetest .register_ore({
-      ore_type       = 'scatter',
-      ore            = new,
-      wherein        = old,
-      clust_scarcity = 1,
-      clust_num_ores = 1,
-      clust_size     = 1,
-      y_min          = -30156,
-      y_max          = -30108,
-    })
-end
+replace( dirts,  'nssb:fall_morentir', -30091,  -30140 )  -- sand
 
+replace( 'default:stone_with_iron', 'nssb:morentir', -30091, -30140 )
+replace( 'default:stone_with_mese', 'nssb:morentir', -30091, -30140 )
+replace( 'default:stone_with_copper', 'nssb:morentir', -30091, -30140 )
 
-minetest .register_ore({
-    ore_type        = 'blob',
-    ore             = 'nssb:fall_morentir',
-    wherein         = 'air',
-    clust_scarcity  = 16 *16 *16,
-    clust_size      = 6,
-    y_min           = -30204,
-    y_max           = -30109,
-    noise_threshold = 0.0,
-    noise_params    = {
-      offset  = 0.5,
-      scale  = 0.2,
-      spread  = { x = 5,  y = 5,  z = 5 },
-      seed  = 17676,
-      octaves  = 1,
-      persist  = 0.0
-    },
-})
-
-
-replace5('default:stone', 'nssb:morentir')
-replace5('default:stone_with_coal', 'nssb:life_energy_ore')
-replace5('default:stone_with_iron', 'nssb:morentir')
-replace5('default:stone_with_mese', 'nssb:morentir')
-replace5('default:stone_with_diamond', 'nssb:life_energy_ore')
-replace5('default:stone_with_gold', 'nssb:life_energy_ore')
-replace5('default:stone_with_copper', 'nssb:morentir')
-replace5('default:gravel', 'nssb:morkemen')
-replace5('default:dirt', 'nssb:morkemen')
-replace5('default:sand', 'nssb:morkemen')
-replace5('default:lava_source', 'nssb:morentir')
-replace5('default:lava_flowing', 'nssb:morentir')
-replace5('default:water_source', 'nssb:mornen')
-replace5('default:water_flowing', 'nssb:mornen_flowing')
-replace5('default:mese_block', 'nssb:life_energy_ore')
-replace5(  {'nssb:ant_dirt',  'default:stone',  'default:cobble',  'default:stonebrick',  'default:mossycobble',  'default:desert_stone',  'default:desert_cobble',  'default:desert_stonebrick',  'default:sandstone',  'default:sandstonebrick'},  'nssb:morkemen' )
-
+replace(  'default:stone_with_coal',  life,  -30091,  -30140  )
+replace(  'default:stone_with_gold',  life,  -30091,  -30140  )
+replace(  'default:stone_with_diamond',  life,  -30091,  -30140  )
 
 if moreores then
-  replace5('moreores:mineral_tin',  'nssb:life_energy_ore')
-  replace5('moreores:mineral_silver',  'nssb:morentir')
-  replace5('moreores:mineral_mithril',  'nssb:moranga')
+  replace( 'moreores:mineral_tin',  life,  -30091,  -30140  )
+  replace( 'moreores:mineral_silver',  'nssb:morentir'  )
+  replace( 'moreores:mineral_mithril',  'nssb:moranga'  )
 end
 
--- 6th layer from 30141 to 30189 is underground with other caves and the special metal
+-- 6th layer 30141 to 30190 has more special moranga metal
 
-local function replace6(old, new)
-    minetest .register_ore({
-      ore_type       = 'scatter',
-      ore            = new,
-      wherein        = old,
-      clust_scarcity = 1,
-      clust_num_ores = 1,
-      clust_size     = 1,
-      y_min          = -30205,
-      y_max          = -30157,
-    })
-end
+replace( 'default:stone_with_diamond', life,  -30141,  -30190  )
+replace( 'default:stone_with_coal', life,  -30141,  -30190  )
+replace( 'default:stone_with_gold', life,  -30141,  -30190  )
+replace( 'default:mese_block', life,  -30141,  -30190  )
 
+replace( 'default:stone_with_iron', 'nssb:moranga', -30141, -30190  )
+replace( 'default:stone_with_mese', 'nssb:moranga', -30141, -30190  )
+replace( 'default:stone_with_copper', 'nssb:moranga', -30141, -30190  )
 
-replace6('default:stone', 'nssb:morentir')
-replace6('default:stone_with_coal', 'nssb:life_energy_ore')
-replace6('default:stone_with_iron', 'nssb:moranga')
-replace6('default:stone_with_mese', 'nssb:moranga')
-replace6('default:stone_with_diamond', 'nssb:life_energy_ore')
-replace6('default:stone_with_gold', 'nssb:life_energy_ore')
-replace6('default:stone_with_copper', 'nssb:moranga')
-replace6('default:gravel', 'nssb:morkemen')
-replace6('default:dirt', 'nssb:morkemen')
-replace6('default:sand', 'nssb:morkemen')
-replace6('default:lava_source', 'nssb:morentir')
-replace6('default:lava_flowing', 'nssb:morentir')
-replace6('default:water_source', 'nssb:mornen')
-replace6('default:water_flowing', 'nssb:mornen_flowing')
-replace6('default:mese_block', 'nssb:life_energy_ore')
-replace6(  {'nssb:ant_dirt',  'default:stone',  'default:cobble',  'default:stonebrick',  'default:mossycobble',  'default:desert_stone',  'default:desert_cobble',  'default:desert_stonebrick',  'default:sandstone',  'default:sandstonebrick'},  'nssb:morkemen' )
-
+replace( dirts, 'nssb:morkemen', -30141, -30190  )
 
 if moreores then
-  replace6( 'moreores:mineral_tin',  'nssb:life_energy_ore' )
-  replace6( 'moreores:mineral_silver',  'nssb:moranga' )
-  replace6( 'moreores:mineral_mithril',  'nssb:moranga' )
+  replace( 'moreores:mineral_tin', life, -30141, -30190 )
+  replace( 'moreores:mineral_silver', 'nssb:moranga', -30141, -30190 )
+  replace( 'moreores:mineral_mithril', 'nssb:moranga', -30141, -30190 )
 end
 
 
@@ -711,53 +440,13 @@ minetest .register_ore({
       clust_scarcity = 13 *13 *13,
       clust_num_ores = 1,
       clust_size     = 1,
-      y_min          = -30205,
-      y_max          = -30157,
+      y_min          = -30150,
+      y_max          = -30190,
     })
 
--- 7th layer from 30190 to 30197 is indistructible
+--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-minetest.register_ore({
-    ore_type       = 'scatter',
-    ore            = 'nssb:indistructible_morentir',
-    wherein        = {  'nssb:ant_dirt',  'default:stone',  'default:cobble',  'default:stonebrick',  'default:mossycobble',  'default:desert_stone',  'default:desert_cobble',  'default:desert_stonebrick',  'default:sandstone',  'default:sandstonebrick',  'default:water_source',  'default:water_flowing',  'default:gravel',  'default:dirt',  'default:sand',  'default:lava_source',  'default:lava_flowing',  'default:mese_block',  'default:stone',  'air',  'default:stone_with_coal',  'default:stone_with_iron',  'default:stone_with_mese',  'default:stone_with_diamond',  'default:stone_with_gold',  'default:stone_with_copper'  },
-    clust_scarcity = 1,
-    clust_num_ores = 1,
-    clust_size     = 1,
-    y_min          = -30213,
-    y_max          = -30206,
-})
-
-
-
-if moreores then
-    minetest .register_ore({
-      ore_type       = 'scatter',
-      ore            = 'nssb:indistructible_morentir',
-      wherein        = {  'moreores:mineral_tin',  'moreores:mineral_silver',  'moreores:mineral_mithril'  },
-      clust_scarcity = 1,
-      clust_num_ores = 1,
-      clust_size     = 1,
-      y_min          = -30213,
-      y_max          = -30206,
-    })
-end
-
-
-minetest .register_ore({
-    ore_type       = 'scatter',
-    ore            = 'air',
-    wherein        = {  'default:water_source',  'default:water_flowing',  'default:lava_source',  'default:lava_flowing'  },
-    clust_scarcity = 1,
-    clust_num_ores = 1,
-    clust_size     = 1,
-    y_min          = -30207,
-    y_max          = -30045,
-})
-
-
-
---Place the buildings in the morlendor
+--  Place the buildings in the morlendor
 posmorvalarblock  = { x = 827,  y = -30094,  z = -817 }
 posplace          = { x = 0,    y = -30093,  z = 0 }
 posmemory         = { x = 0,    y = -30092,  z = 0 }
@@ -823,8 +512,8 @@ end
 -- ABM's  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 minetest .register_abm({
-  nodenames = {'nssb:indistructible_morentir'},
-  neighbors = {'nssb:mornar'},
+  nodenames = { 'nssb:indistructible_morentir' },
+  neighbors = { 'nssb:mornar' },
   interval = 1.0,
   chance = 1,
 
@@ -872,8 +561,8 @@ minetest .register_abm({
 
 
 minetest .register_abm({
-  nodenames = {'default:torch'},
-  neighbors = { 'nssb:morentir', 'nssb:morkemen' },
+  nodenames = { 'default:torch' },
+  neighbors = { 'nssb:morentir',  'nssb:morkemen' },
   interval = 1.0,
   chance = 1,
   action =
