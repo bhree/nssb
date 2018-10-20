@@ -74,8 +74,9 @@ v3.0 - Oct 2018 -- Sketch2 updates
     > wtf is this:
       --the timer is saved inside a position because for me the tonumber function doesn't work
 
+    > redid the layers, so they actually make sense
+
     -- will change portal to use a "hold-item-and-punch" function instead of ABM's
-    -- it's bad enough to use ABM's for this, but what's with that timer function?
 
 
   nodes.lua
@@ -100,6 +101,19 @@ v3.0 - Oct 2018 -- Sketch2 updates
       - liquid_viscosity  = 20,
       + liquid_viscosity  = 5,
 
+    > split into 2 files, so it's easier to reference materials
+
+      organic_nodes.lua
+      inorganic_nodes.lua
+
+  spawn.lua
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    > typo, .93 looks like it should be -93 because it relates to depth:
+
+      - mobs:spawn_specific("nssm:mordain",  ...  -31000, .93)
+
+      + mobs :spawn_specific( 'nssm:mordain',  ...  -31000, -93 )
 
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
