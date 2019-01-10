@@ -3,15 +3,19 @@ if minetest.get_modpath("moreores") then
 	moreores=true
 end
 
+
 nssb.mymapgenis = tonumber(minetest.setting_get('mymapgenis')) or 7
 if (nssb.mymapgenis~=6) and (nssb.mymapgenis~=7) then
 	nssb.mymapgenis = 7
 end
 
+
 --schematichs generation
 local posplace = {x=0, y=-30093, z=0}
 local posmemory = {x=0, y=-30092, z=0}
 local postest = {x=5, y=-30091, z=6}
+
+
 function nssb_register_buildings(
 	build,			-- name of the schematic
 	rand,			-- 1/rand is the probability of the spawning of the schematic if the place found is acceptable
@@ -31,26 +35,36 @@ function nssb_register_buildings(
 
 	minetest.register_on_generated(function(minp, maxp, seed)
 		if underground==false then
+				
 			local i, j, k
 			local flag=0
 			local posd
+				
 			i = math.random(minp.x, maxp.x)
 			k = math.random(minp.z, maxp.z)
+				
 			for j=minp.y,maxp.y do
 				local pos1 = {x=i, y=j, z=k}
 				local pos2 = {x=i+down, y=j-1, z=k+down}
 				local pos3 = {x=i, y=j+above, z=k}
+					
 				local n = minetest.env:get_node(pos1).name
 				local u = minetest.env:get_node(pos2).name
 				local d = minetest.env:get_node(pos3).name
+					
 				if (downblock==nil) then
 					u = downblock
 				end
+					
 				if (aboveblock==nil) then
 					d = aboveblock
 				end
-				if n== posschem and u== downblock and d==aboveblock and flag==0 and math.random(1,rand)==1 then
+					
+				if n== posschem and u== downblock and d==aboveblock 
+						and flag==0 and math.random(1,rand)==1 then
+						
 					if minetest.find_node_near(pos3, radius, near) then
+							
 							minetest.place_schematic(pos1, minetest.get_modpath("nssb").."/schems/".. build ..".mts", "0", {}, true)
 							--minetest.chat_send_all("Added schematic in "..(minetest.pos_to_string(pos1)))
 							posd=pos1
@@ -58,212 +72,290 @@ function nssb_register_buildings(
 					end
 				end
 			end
+				
 			--Puts dirt/ice under the schematic to fill the space under it
 			if flag==1 and side>0 then
 				for dx = 0,side do
 					for dz = 0,side do
 						local dy=posd.y-1
 						local f = {x = posd.x+dx, y=dy, z=posd.z+dz}
-						local fg = minetest.env:get_node(f).name
+						local nodename = minetest.env:get_node(f).name
+							
 						if ice == false then
-							while fg=="air" do
+							while nodename=="air" do
 								minetest.env:set_node(f, {name="default:dirt"})
 								f.y=f.y-1
-								fg = minetest.env:get_node(f).name
-							end
+								nodename = minetest.env:get_node(f).name
+							end -- while air
 						else
-							while fg=="air" do
+							while nodename=="air" do
 									minetest.env:set_node(f, {name="default:ice"})
 									f.y=f.y-1
-									fg = minetest.env:get_node(f).name
-							end
-						end
-					end
-				end
-			end
-			if portal==true then
-				--[[
-				--this is a portal for the morlendor
-				if already_spawned == 0 then
-					--already_spawned = 1
-					local name = minetest.get_node(posplace).name
-					minetest.chat_send_all("Non ancora creato. Nome: "..name)
-					if name == "ignore" then
-						local pmin, pmax = minetest.get_voxel_manip():read_from_map(vector.subtract(posplace, 80), vector.add(posplace, 80))
-						name = minetest.get_node(posplace).name
-						minetest.chat_send_all("name dopo read_from_map:.."..name)
-						if name == "ignore" then
-							minetest.emerge_area(vector.subtract(posplace, 80), vector.add(posplace, 80))
-							name = minetest.get_node(posplace).name
-							minetest.chat_send_all("name dopo emerge_area:.."..name)
-						end
-						minetest.after(25, function(posplace)
-							name = minetest.get_node(posplace).name
-							minetest.chat_send_all("name prima di place_schematic:.."..name)
-							minetest.place_schematic(posplace, minetest.get_modpath("nssb").."/schems/memoportal.mts", "0", {}, true)
-							--minetest.place_schematic(posplace, minetest.get_modpath("nssb").."/schems/memoportal.mts", "0", {}, true)
-							--minetest.chat_send_all("3")
-							name = minetest.get_node(posplace).name
-							minetest.chat_send_all("name dopo place_schematic:.."..name)
-						end, posplace)
-					end
-					minetest.place_schematic(posplace, minetest.get_modpath("nssb").."/schems/memoportal.mts", "0", {}, true)
-				end
-				]]--
-			end
+									nodename = minetest.env:get_node(f).name
+							end -- while air
+						end -- if not ice
+					end -- dz
+				end -- dx
+			end -- if flag == 1 and side > 0
 		else	--underground==true
+				
 			if minp.y<0 then
 				--minetest.chat_send_all("Posmin: "..(minetest.pos_to_string(minp)).." Posmax: "..(minetest.pos_to_string(maxp)))
-				local i, jj, k, j
+				local i, j, k
 				local flag=0
+					
+				 local height  = height or 0
+        			if maxp.y > height then maxp.y  = height end
 
 				i = math.random(minp.x, maxp.x)
 				k = math.random(minp.z, maxp.z)
-				jj = math.random(minp.y, maxp.y)
-				if height~=nil then
-					if height>maxp.y then
-						j = jj
-					elseif height>minp.y and height<maxp.y then
-						j = math.random(minp.y, height)
-					else
-						return
-					end
-				else
-					if jj>0 then
-						j = math.random(minp.y, 0)
-					end
-				end
+				j = math.random(minp.y, maxp.y)
+					
 				local pos1={x=i, y=j, z=k}
-				local n = minetest.env:get_node(pos1).name
+				local nodename = minetest.env:get_node(pos1).name
+					
 				if minetest.find_node_near(pos1, radius, "default:lava_source")or flag==1 then
 					return
 				else
-					if n==posschem and math.random(1,rand)==1 then
+					if nodename==posschem and math.random(1,rand)==1 then
 						minetest.place_schematic(pos1, minetest.get_modpath("nssb").."/schems/".. build ..".mts", "0", {}, true)
 						flag=1
 						--minetest.chat_send_all("Added schematic in "..(minetest.pos_to_string(pos1)))
-					end
-				end
+					end -- if nodename == posschem
+				end -- if.find_node_near()
 			end
 		end
 	end)
 end
 
+
+--  (  buildname,  random chance,  nodename,
+--  numberdown,  namedown,  numberabove,  nameabove,
+--  radius,  near,  width2fill,  underground,
+--  height,  ice,  exact_height,  portal  )
+
 if nssb.mymapgenis == 6 then
-	nssb_register_buildings ('spiaggiagranchius', 2, "default:sand", 3, "default:sand", 2, "air",  3, "air", 0, false, nil, false, false, false)
-	nssb_register_buildings ('acquagranchius', 3, "default:sand", 3, "default:sand", 12,"default:water_source", 3, "default:water_source", 0, false, nil, false, false, false)
-	nssb_register_buildings ('ooteca', 6, "default:dirt_with_grass", 3, "default:dirt", 2, "air", 24, "default:tree", 8, false, nil, false, false, false)
+	nssb_register_buildings (
+		'spiaggiagranchius', 2, "default:sand", 
+		3, "default:sand", 2, "air",  
+		3, "air", 0, false, 
+		nil, false, false, false)
+	
+	nssb_register_buildings (
+		'acquagranchius', 3, "default:sand", 
+		3, "default:sand", 12,"default:water_source", 
+		3, "default:water_source", 0, false, 
+		nil, false, false, false)
+	
+	nssb_register_buildings (
+		'ooteca', 6, "default:dirt_with_grass", 3, "default:dirt", 2, "air", 24, "default:tree", 8, false, nil, false, false, false)
+
 	nssb_register_buildings ('minuscolaooteca', 6, "default:dirt_with_grass",3 , "default:dirt", 2, "air", 24, "default:tree", 2, false, nil, false, false, false)
+
 	nssb_register_buildings ('piccolaooteca', 6, "default:dirt_with_grass", 2, "default:dirt", 2, "air", 24, "default:tree", 4, false, nil, false, false, false)
+
 	nssb_register_buildings ('arcate', 8, "default:sand", 3, "default:sand", 13, "default:water_source", 3, "default:water_source",0, false, nil, false, false, false)
+
 	nssb_register_buildings ('grandepiramide', 8, "default:dirt", 3, "default:dirt", 20, "default:water_source", 3, "default:water_source", 0, false, nil, false, false, false)
+
 	nssb_register_buildings ('collina', 5, "default:dirt_with_grass", 3, "default:dirt", 2, "air", 3, "air", 12, false, nil, false, false, false)
+
 	nssb_register_buildings ('megaformicaio', 7, "default:dirt_with_grass", 4, "default:dirt", 2, "air", 3, "air", 25, false, nil, false, false, false)
+
 	nssb_register_buildings ('antqueenhill', 8, "default:dirt_with_grass", 4, "default:dirt", 2, "air", 3, "air", 21, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine1', 4, "default:dirt_with_grass", 3, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
-	--nssb_register_buildings ('rovine2', 1, "default:stone", 0, "air",  0, "air", 24, "default:jungletree", 5, true, -8, false, false)
+
 	nssb_register_buildings ('rovine3', 4, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine4', 4, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine5', 4, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine6', 4, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine7', 4, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine8', 4, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine9', 4, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine10', 4, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('bozzoli', 4, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
 
 	nssb_register_buildings ('picco', 12, "default:desert_sand", 1, "default:desert_stone",  1, "air", 3, "default:desert_sand", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('piccoghiaccio', 12, "default:dirt_with_snow", 1, "default:dirt",  1, "air", 3, "default:dirt_with_snow", 10, false, nil, true, false, false)
+
 	nssb_register_buildings ('icehall', 8, "default:dirt_with_snow", 1, "default:dirt",  1, "air", 3, "default:dirt_with_snow", 30, false, nil, true, false, false)
+
 	nssb_register_buildings ('piccomoonheron', 8, "default:dirt_with_snow", 1, "default:dirt",  1, "air", 3, "default:dirt_with_snow", 3, false, nil, true, false, false)
+
 	nssb_register_buildings ('doppiopiccoghiaccio', 11, "default:dirt_with_snow", 1, "default:dirt",  1, "air", 3, "default:dirt_with_snow", 7, false, nil, true, false, false)
+
 	nssb_register_buildings ('doppiopiccosabbia', 11, "default:desert_sand", 1, "default:desert_stone",  1, "air", 3, "default:desert_sand", 7, false, nil, false, false, false)
-	nssb_register_buildings ('piccoscrausics', 8, "default:desert_sand", 1, "default:desert_stone",  1, "air", 3, "default:desert_sand", 3, false, nil, false, false, false)
-	nssb_register_buildings ('fossasand', 20, "default:desert_sand", 1, "default:desert_stone",  1, "air", 3, "default:desert_sand", 16, false, nil, false, false, false)
-	nssb_register_buildings ('portal', 100, "default:dirt_with_grass", 2, "default:dirt", 2, "air", 24, "air", 11, false, nil, false, false, true)
+
+	nssb_register_buildings (
+		'piccoscrausics', 8, "default:desert_sand", 
+		1, "default:desert_stone",  1, "air", 
+		3, "default:desert_sand", 3, false, 
+		nil, false, false, false)
+
+	nssb_register_buildings (
+		'fossasand', 20, "default:desert_sand", 
+		1, "default:desert_stone",  1, "air", 
+		3, "default:desert_sand", 16, false, 
+		nil, false, false, false)
+
+	nssb_register_buildings (
+		'portal', 100, "default:dirt_with_grass", 
+		2, "default:dirt", 2, "air", 
+		24, "air", 11, false,
+		nil, false, false, true)
+	
 else 		--mymapgenis 7
 	nssb_register_buildings ('spiaggiagranchius', 5, "default:sand", 3, "default:sand", 2, "air",  3, "air", 0, false, nil, false, false, false)
+
 	nssb_register_buildings ('acquagranchius', 6, "default:sand", 3, "default:sand", 12,"default:water_source", 3, "default:water_source", 0, false, nil, false, false, false)
+
 	nssb_register_buildings ('ooteca', 12, "default:dirt_with_grass", 3, "default:dirt", 2, "air", 24, "default:tree", 8, false, nil, false, false, false)
+
 	nssb_register_buildings ('minuscolaooteca', 11, "default:dirt_with_grass",3 , "default:dirt", 2, "air", 24, "default:tree", 2, false, nil, false, false, false)
+
 	nssb_register_buildings ('piccolaooteca', 11, "default:dirt_with_grass", 2, "default:dirt", 2, "air", 24, "default:tree", 4, false, nil, false, false, false)
+
 	nssb_register_buildings ('arcate', 24, "default:sand", 3, "default:sand", 13, "default:water_source", 3, "default:water_source",0, false, nil, false, false, false)
+
 	nssb_register_buildings ('grandepiramide', 24, "default:dirt", 3, "default:dirt", 20, "default:water_source", 3, "default:water_source", 0, false, nil, false, false, false)
+
 	nssb_register_buildings ('collina', 14, "default:dirt_with_grass", 3, "default:dirt", 2, "air", 3, "air", 12, false, nil, false, false, false)
+
 	nssb_register_buildings ('megaformicaio', 20, "default:dirt_with_grass", 4, "default:dirt", 2, "air", 3, "air", 25, false, nil, false, false, false)
+
 	nssb_register_buildings ('antqueenhill', 22, "default:dirt_with_grass", 4, "default:dirt", 2, "air", 3, "air", 21, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine1', 6, "default:dirt_with_grass", 3, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
-	--nssb_register_buildings ('rovine2', 1, "default:stone", 0, "air",  0, "air", 24, "default:jungletree", 5, true, -8, false, false)
+
 	nssb_register_buildings ('rovine3', 6, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine4', 6, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine5', 6, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine6', 6, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine7', 6, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine8', 6, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine9', 6, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('rovine10', 6, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('bozzoli', 4, "default:dirt_with_grass", 1, "default:dirt",  2, "air", 8, "default:jungletree", 10, false, nil, false, false, false)
 
 	nssb_register_buildings ('picco', 32, "default:desert_sand", 1, "default:desert_stone",  1, "air", 3, "default:desert_sand", 10, false, nil, false, false, false)
+
 	nssb_register_buildings ('piccoghiaccio', 32, "default:dirt_with_snow", 1, "default:dirt",  1, "air", 3, "default:dirt_with_snow", 10, false, nil, true, false, false)
+
 	nssb_register_buildings ('icehall', 40, "default:dirt_with_snow", 1, "default:dirt",  1, "air", 3, "default:dirt_with_snow", 30, false, nil, true, false, false)
+
 	nssb_register_buildings ('piccomoonheron', 32, "default:dirt_with_snow", 1, "default:dirt",  1, "air", 3, "default:dirt_with_snow", 3, false, nil, true, false, false)
+
 	nssb_register_buildings ('doppiopiccoghiaccio', 32, "default:dirt_with_snow", 1, "default:dirt",  1, "air", 3, "default:dirt_with_snow", 7, false, nil, true, false, false)
+
 	nssb_register_buildings ('doppiopiccosabbia', 32, "default:desert_sand", 1, "default:desert_stone",  1, "air", 3, "default:desert_sand", 7, false, nil, false, false, false)
+
 	nssb_register_buildings ('piccoscrausics', 32, "default:desert_sand", 1, "default:desert_stone",  1, "air", 3, "default:desert_sand", 3, false, nil, false, false, false)
+
 	nssb_register_buildings ('fossasand', 50, "default:desert_sand", 1, "default:desert_stone",  1, "air", 3, "default:desert_sand", 16, false, nil, false, false, false)
+
 	nssb_register_buildings ('portal', 200, "default:dirt_with_grass", 2, "default:dirt", 2, "air", 24, "air", 11, false, nil, false, false, true)
 end
-nssb_register_buildings ('blocohouse', 4, "default:stone", 0, "air",  0, "air", 3, "default:stone", 5, true, -10, false, false, false)
-nssb_register_buildings ('bigblocohouse', 4, "default:stone", 0, "air",  0, "air", 3, "default:stone", 5, true, -20, false, false, false)
-nssb_register_buildings ('blocobiggesthouse', 4, "default:stone", 0, "air",  0, "air", 3, "default:stone", 5, true, -30, false, false, false)
 
+-- build in all mapgen types
 
+nssb_register_buildings ('blocohouse', 4, "default:stone", 
+	0, "air",  0, "air", 3, "default:stone", 
+	5, true, -10, false, false, false)
 
+nssb_register_buildings ('bigblocohouse', 4, "default:stone", 
+	0, "air",  0, "air", 3, "default:stone", 
+	5, true, -20, false, false, false)
 
-
-
+nssb_register_buildings ('blocobiggesthouse', 4, "default:stone", 
+	0, "air",  0, "air", 3, "default:stone", 
+	5, true, -30, false, false, false)
 
 --nodes gen
 
 --This dimension is "divided" in in 7 layer.
 --1st layer from 30000 to 30007 is indistructible, made of indistructible morentir
 
-
-
-for i=1,9 do
-	minetest.register_ore({
+minetest.register_ore({
 		ore_type       = "scatter",
 		ore            = "nssb:indistructible_morentir",
-		wherein        = {"default:water_source","default:water_flowing","default:gravel", "default:dirt", "default:sand", "default:lava_source", "default:lava_flowing", "default:mese_block", "default:stone","air","default:stone_with_coal","default:stone_with_iron","default:stone_with_mese","default:stone_with_diamond","default:stone_with_gold","default:stone_with_copper","nssb:ant_dirt","default:stone","default:cobble","default:stonebrick","default:mossycobble","default:desert_stone","default:desert_cobble","default:desert_stonebrick","default:sandstone","default:sandstonebrick"},
+		
+		wherein        = {"default:water_source",
+			"default:water_flowing",
+			
+			"default:lava_source", 
+			"default:lava_flowing",
+			
+			"air",
+			"default:stone",
+			"default:stone_with_coal",
+			"default:stone_with_copper",
+			"default:stone_with_iron",
+			"default:stone_with_gold",
+			"default:stone_with_diamond",
+			"default:stone_with_mese",
+			"default:mese_block",
+			
+			"nssb:ant_dirt",
+			"default:dirt",
+			"default:gravel",
+			"default:sand",
+			
+			"default:cobble",
+			"default:stonebrick",
+			"default:mossycobble",
+			"default:desert_stone",
+			"default:desert_cobble",
+			"default:desert_stonebrick",
+			"default:sandstone",
+			"default:sandstonebrick"},
+		
 		clust_scarcity = 1,
 		clust_num_ores = 1,
 		clust_size     = 1,
 		y_min          = -30044,
 		y_max          = -30037,
 	})
-end
+
+
 
 if moreores then
-	for i=1,9 do
-		minetest.register_ore({
+	minetest.register_ore({
 			ore_type       = "scatter",
 			ore            = "nssb:indistructible_morentir",
-			wherein        = {"moreores:mineral_tin", "moreores:mineral_silver", "moreores:mineral_mithril"},
+			wherein        = {"moreores:mineral_tin", 
+				"moreores:mineral_silver", 
+				"moreores:mineral_mithril"},
 			clust_scarcity = 1,
 			clust_num_ores = 1,
 			clust_size     = 1,
 			y_min          = -30044,
 			y_max          = -30037,
-		})
-	end
+	})
 end
 
---2� layer from 30008 to 30028, is "stalagmitic", have bats and morelentir
+
+--2nd layer from 30008 to 30028, is "stalagmitic", have bats and morelentir
 
 local function replace2(old, new)
-	for i=1,9 do
-		minetest.register_ore({
+	minetest.register_ore({
 			ore_type       = "scatter",
 			ore            = new,
 			wherein        = old,
@@ -272,29 +364,51 @@ local function replace2(old, new)
 			clust_size     = 1,
 			y_min          = -30065,
 			y_max          = -30045,
-		})
-	end
+	})
 end
 
+
 replace2("default:stone", "nssb:morentir")
-replace2("default:stone_with_coal", "nssb:morelentir")
-replace2("default:stone_with_iron", "nssb:morelentir")
-replace2("default:stone_with_mese", "nssb:morelentir")
-replace2("default:stone_with_diamond", "nssb:morelentir")
-replace2("default:stone_with_gold", "nssb:morelentir")
-replace2("default:stone_with_copper", "nssb:morelentir")
-replace2("default:gravel", "nssb:morelentir")
-replace2("default:dirt", "nssb:morelentir")
-replace2("default:sand", "nssb:morelentir")
-replace2("default:water_source", "nssb:morelentir")
-replace2("default:water_flowing", "nssb:morelentir")
-replace2("default:lava_source", "nssb:morelentir")
-replace2("default:lava_flowing", "nssb:morelentir")
-replace2("default:mese_block", "nssb:morelentir")
-replace2({"nssb:ant_dirt","default:stone","default:cobble","default:stonebrick","default:mossycobble","default:desert_stone","default:desert_cobble","default:desert_stonebrick","default:sandstone","default:sandstonebrick"}, "nssb:morelentir")
+
+
+replace2(  {  'default:stone_with_coal',
+              'default:stone_with_copper',
+              'default:stone_with_iron',
+              'default:stone_with_gold',
+              'default:stone_with_diamond',
+              'default:stone_with_mese',
+              'default:mese_block'  },  'nssb:morelentir'  )
+
+
+replace2(  {  'default:dirt',
+              'default:gravel',
+              'default:sand'  },  'nssb:morelentir'  )
+
+
+replace2(  {  'default:water_source',
+              'default:water_flowing',
+              'default:lava_source',
+              'default:lava_flowing'},  'nssb:morelentir'  )
+
+
+replace2(  {  'nssb:ant_dirt',
+              'default:stone',
+              'default:cobble',
+              'default:stonebrick',
+              'default:mossycobble',
+              'default:desert_stone',
+              'default:desert_cobble',
+              'default:desert_stonebrick',
+              'default:sandstone',
+              'default:sandstonebrick' },  'nssb:morelentir' )
+
+
 if moreores then
-	replace2({"moreores:mineral_tin", "moreores:mineral_silver", "moreores:mineral_mithril"},"air")
+	replace2({"moreores:mineral_tin", 
+			"moreores:mineral_silver", 
+			"moreores:mineral_mithril"},"air")
 end
+
 
 minetest.register_ore({
 		ore_type        = "blob",
@@ -313,8 +427,10 @@ minetest.register_ore({
 			octaves = 1,
 			persist = 0.0
 		},
-	})
-for i=1,3 do
+})
+
+
+
 minetest.register_ore({
 			ore_type       = "scatter",
 			ore            = "air",
@@ -325,13 +441,11 @@ minetest.register_ore({
 			y_min          = -30066,
 			y_max          = -30058,
 		})
-end
 
 
 --3� layer from 30029 to 30077 is made by air
 
-for i=1,32 do
-	minetest.register_ore({
+minetest.register_ore({
 		ore_type       = "scatter",
 		ore            = "air",
 		wherein        = {"nssb:ant_dirt","default:stone","default:cobble","default:stonebrick","default:mossycobble","default:desert_stone","default:desert_cobble","default:desert_stonebrick","default:sandstone","default:sandstonebrick","default:water_source","default:water_flowing","default:gravel", "default:dirt", "default:sand", "default:lava_source", "default:lava_flowing", "default:mese_block", "default:stone","air","default:stone_with_coal","default:stone_with_iron","default:stone_with_mese","default:stone_with_diamond","default:stone_with_gold","default:stone_with_copper"},
@@ -340,10 +454,10 @@ for i=1,32 do
 		clust_size     = 1,
 		y_min          = -30093,
 		y_max          = -30066,
-	})
-end
+})
+
+
 if moreores then
-	for i=1,9 do
 		minetest.register_ore({
 			ore_type       = "scatter",
 			ore            = "air",
@@ -354,8 +468,8 @@ if moreores then
 			y_min          = -30093,
 			y_max          = -30066,
 		})
-	end
 end
+
 
 minetest.register_ore({
 		ore_type        = "blob",
@@ -375,6 +489,7 @@ minetest.register_ore({
 			persist = 0.0
 		},
 	})
+
 
 minetest.register_ore({
 		ore_type        = "blob",
